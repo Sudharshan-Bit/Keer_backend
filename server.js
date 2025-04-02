@@ -1,16 +1,13 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from "./config/db.js";
-import itemRoutes from "./routes/itemRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-import attendance from "./routes/attendance.js";
+import connectDB from "../config/db.js"; // Adjust path as needed
+import itemRoutes from "../routes/itemRoutes.js"; // Adjust path as needed
+import authRoutes from "../routes/authRoutes.js"; // Adjust path as needed
+import attendance from "../routes/attendance.js"; // Adjust path as needed
 import path from "path";
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 dotenv.config();
 connectDB();
@@ -18,12 +15,17 @@ connectDB();
 const app = express();
 app.use(express.json());
 app.use(cors());
-// app.use("/uploads", express.static(path.resolve("uploads"))); 
 
+// Static file serving
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.use("/api/items", itemRoutes);
 app.use("/api/attendance", attendance);
 app.use("/api/auth", authRoutes);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Export the app to be used by Vercel
+export default (req, res) => {
+  app(req, res);
+};
